@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proptech Operations MVP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Proptech Operations MVP</p>
+          <h1>Broker control, RM visibility, verified site visits.</h1>
+        </div>
+        <div id="auth-pill" class="auth-pill">Not logged in</div>
+      </header>
+
+      <main>
+        <section id="login-panel" class="panel login-panel">
+          <h2>Login</h2>
+          <p class="muted">Use demo users printed in the terminal when server starts.</p>
+          <form id="login-form" class="grid two">
+            <label>
+              Email
+              <input type="email" id="login-email" required />
+            </label>
+            <label>
+              Password
+              <input type="password" id="login-password" required />
+            </label>
+            <button type="submit" class="primary">Sign in</button>
+          </form>
+        </section>
+
+        <section id="main-panel" class="hidden">
+          <div class="toolbar panel">
+            <div class="toolbar-left">
+              <label>
+                City filter
+                <select id="city-filter">
+                  <option value="">All</option>
+                  <option value="Jaipur">Jaipur</option>
+                  <option value="Nagpur">Nagpur</option>
+                </select>
+              </label>
+              <button id="refresh-button" class="ghost">Refresh</button>
+              <button id="logout-button" class="ghost">Logout</button>
+            </div>
+            <div id="flag-strip" class="flag-strip"></div>
+          </div>
+
+          <section class="panel metrics-panel">
+            <h2>Snapshot</h2>
+            <div id="metrics-grid" class="metrics-grid"></div>
+          </section>
+
+          <section id="broker-sections" class="hidden">
+            <div class="panel">
+              <h2>Inventory</h2>
+              <form id="inventory-form" class="grid three compact">
+                <label>Title<input id="p-title" required /></label>
+                <label>
+                  Asset type
+                  <select id="p-asset-type" required>
+                    <option>Apartment</option>
+                    <option>Plot</option>
+                    <option>Villa</option>
+                  </select>
+                </label>
+                <label>Configuration<input id="p-configuration" placeholder="3 BHK / 1200 sqft" /></label>
+                <label>Location<input id="p-location" required /></label>
+                <label>
+                  City
+                  <select id="p-city" required>
+                    <option>Jaipur</option>
+                    <option>Nagpur</option>
+                  </select>
+                </label>
+                <label>Price (INR)<input id="p-price" type="number" required /></label>
+                <label>Latitude<input id="p-latitude" type="number" step="any" /></label>
+                <label>Longitude<input id="p-longitude" type="number" step="any" /></label>
+                <label>Google Maps URL<input id="p-maps-url" /></label>
+                <label class="span-3">Amenities<input id="p-amenities" placeholder="Parking, Gym, Lift" /></label>
+                <label class="span-3">Image URL<input id="p-image-url" placeholder="For MVP demo, use URL" /></label>
+                <button type="submit" class="primary">Add Property</button>
+              </form>
+              <div id="inventory-list" class="list-grid"></div>
+            </div>
+
+            <div class="panel">
+              <h2>Site Visits Scheduled</h2>
+              <div id="visits-list" class="table-wrap"></div>
+            </div>
+
+            <div class="panel">
+              <h2>Availability Calendar (Slots)</h2>
+              <form id="slot-form" class="grid three compact">
+                <label>
+                  City
+                  <select id="slot-city">
+                    <option>Jaipur</option>
+                    <option>Nagpur</option>
+                  </select>
+                </label>
+                <label>Start<input id="slot-start" type="datetime-local" required /></label>
+                <label>End<input id="slot-end" type="datetime-local" required /></label>
+                <button type="submit" class="primary">Add Slot</button>
+              </form>
+              <div id="slots-list" class="table-wrap"></div>
+            </div>
+          </section>
+
+          <section id="rm-sections" class="hidden">
+            <div class="panel">
+              <h2>Duplicate Review Queue (24h SLA)</h2>
+              <div id="duplicate-queue" class="table-wrap"></div>
+            </div>
+            <div class="panel">
+              <h2>Emergency Queue</h2>
+              <div id="emergency-queue" class="table-wrap"></div>
+            </div>
+            <div class="panel">
+              <h2>Lead Sync (Excel import every 30 mins)</h2>
+              <button id="import-leads" class="primary">Import Now</button>
+              <div id="leads-list" class="table-wrap"></div>
+            </div>
+            <div class="panel">
+              <h2>Quick Book Visit (WhatsApp demo handoff)</h2>
+              <div class="grid two compact">
+                <label>Properties in same-broker tour<input id="tour-property-count" type="number" min="1" value="1" /></label>
+                <div class="row">
+                  <button id="calc-tour-duration" class="ghost" type="button">Calculate Duration</button>
+                  <span id="tour-duration-output" class="muted"></span>
+                </div>
+              </div>
+              <form id="book-visit-form" class="grid three compact">
+                <label>Property ID<input id="book-property-id" type="number" required /></label>
+                <label>Slot ID<input id="book-slot-id" type="number" required /></label>
+                <label>Customer Name<input id="book-customer-name" required /></label>
+                <label>Customer Phone<input id="book-customer-phone" required /></label>
+                <label class="span-2">Requirements<input id="book-customer-req" /></label>
+                <button type="submit" class="primary">Book Visit</button>
+              </form>
+            </div>
+            <div class="panel">
+              <h2>WhatsApp Integration (Mock)</h2>
+              <form id="wa-send-form" class="grid three compact">
+                <label>To Phone<input id="wa-phone" placeholder="+9198..." required /></label>
+                <label>
+                  Template
+                  <select id="wa-template">
+                    <option value="visit_confirmation">visit_confirmation</option>
+                    <option value="visit_rescheduled_confirmation">visit_rescheduled_confirmation</option>
+                    <option value="customer_cancel_confirmation">customer_cancel_confirmation</option>
+                    <option value="broker_cancel_with_priority">broker_cancel_with_priority</option>
+                    <option value="broker_cancel_without_priority">broker_cancel_without_priority</option>
+                    <option value="otp_verification">otp_verification</option>
+                    <option value="customer_help">customer_help</option>
+                  </select>
+                </label>
+                <label>Related Visit ID (optional)<input id="wa-visit-id" type="number" /></label>
+                <label class="span-3">Context JSON (optional)<input id="wa-context" placeholder='{"visit_id":12,"property_title":"Park View"}' /></label>
+                <button type="submit" class="primary">Send Test Template</button>
+              </form>
+              <div id="wa-messages" class="table-wrap"></div>
+            </div>
+            <div class="panel">
+              <h2>Reports & Exports</h2>
+              <div id="funnel-report" class="metrics-grid"></div>
+              <div id="broker-reliability" class="table-wrap"></div>
+              <div class="actions">
+                <a id="export-visit-counts" class="ghost" href="/api/reports/export.csv?type=visit_counts" target="_blank">Export Visit Counts CSV</a>
+                <a id="export-funnel" class="ghost" href="/api/reports/export.csv?type=funnel" target="_blank">Export Funnel CSV</a>
+                <a id="export-broker-rel" class="ghost" href="/api/reports/export.csv?type=broker_reliability" target="_blank">Export Reliability CSV</a>
+                <a id="export-wa" class="ghost" href="/api/reports/export.csv?type=whatsapp_messages" target="_blank">Export WhatsApp CSV</a>
+                <a id="export-visits" class="ghost" href="/api/reports/export.csv?type=visits" target="_blank">Export Visits CSV</a>
+              </div>
+            </div>
+          </section>
+
+          <section id="srm-sections" class="hidden">
+            <div class="panel">
+              <h2>Escalations (SRM)</h2>
+              <div id="escalation-queue" class="table-wrap"></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Visit Counters (Unique vs Non-unique)</h2>
+            <div id="visit-report" class="table-wrap"></div>
+          </section>
+        </section>
+
+        <section id="customer-self-service" class="panel">
+          <h2>Customer Self-Service (Cancel / Reschedule)</h2>
+          <p class="muted">Customer can manage visits by phone number. This can be linked to WhatsApp chatbot commands.</p>
+          <form id="customer-load-form" class="grid two compact">
+            <label>Customer Phone<input id="customer-phone" placeholder="+91..." required /></label>
+            <button type="submit" class="primary">Load My Visits</button>
+          </form>
+          <div id="customer-visits" class="table-wrap"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="remove-dialog">
+      <form method="dialog" class="dialog-form" id="remove-form">
+        <h3>Remove Property</h3>
+        <input type="hidden" id="remove-property-id" />
+        <label>
+          Reason
+          <select id="remove-reason" required>
+            <option value="Property already sold">Property already sold</option>
+            <option value="Seller changed plan">Seller changed plan to sell</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <label>
+          Details (optional)
+          <textarea id="remove-details" rows="3"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" class="ghost" id="remove-cancel">Cancel</button>
+          <button type="submit" class="danger">Confirm Remove</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="cancel-slot-dialog">
+      <form method="dialog" class="dialog-form" id="cancel-slot-form">
+        <h3>Cancel Slot</h3>
+        <input type="hidden" id="cancel-slot-id" />
+        <label>
+          Reason
+          <input id="cancel-slot-reason" required placeholder="Broker not available" />
+        </label>
+        <label class="row">
+          <input id="cancel-emergency" type="checkbox" /> Emergency cancellation
+        </label>
+        <label>
+          Emergency reason
+          <select id="cancel-emergency-reason">
+            <option value="">Select reason</option>
+            <option value="Sick">Sick</option>
+            <option value="Family emergency">Family emergency</option>
+            <option value="Accident">Accident</option>
+            <option value="Death of close relative">Death of close relative</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <label>
+          Details (optional)
+          <textarea id="cancel-emergency-details" rows="3"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" class="ghost" id="cancel-slot-close">Close</button>
+          <button type="submit" class="danger">Cancel Slot</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="complete-visit-dialog">
+      <form method="dialog" class="dialog-form" id="complete-visit-form">
+        <h3>Complete Visit</h3>
+        <input type="hidden" id="complete-visit-id" />
+        <label>
+          OTP
+          <input id="complete-otp" required placeholder="6-digit OTP" />
+        </label>
+        <div class="geo-row">
+          <button type="button" class="ghost" id="fetch-geo">Fetch Geo</button>
+          <span id="geo-status" class="muted"></span>
+        </div>
+        <label>
+          Customer photo fallback (if GPS fails)
+          <input id="complete-photo" type="file" accept="image/*" />
+        </label>
+        <div class="dialog-actions">
+          <button type="button" class="ghost" id="complete-close">Close</button>
+          <button type="submit" class="primary">Mark Completed</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
