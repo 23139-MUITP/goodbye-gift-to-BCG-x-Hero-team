@@ -195,3 +195,22 @@ Use the same demo users:
 - Current config uses `DATA_DIR=/tmp/proptech-data` on Render.
 - This is fine for demo MVP.
 - If service restarts, data may reset; for production, attach persistent storage and point `DATA_DIR` there.
+
+### If Render URL opens but shows `404 Not Found`
+
+Use this quick diagnosis:
+
+1. Open `<your-render-url>/api/health`
+2. If this works but homepage does not, backend is up and static frontend path is wrong.
+
+Fix in Render service settings:
+
+1. Ensure branch is latest and redeploy after pushing newest code.
+2. Ensure **Start Command** is:
+   - `python3 server.py` (if repo root is `proptech-mvp`)
+   - or `cd proptech-mvp && python3 server.py` (if `proptech-mvp` is a subfolder in repo)
+3. Add env vars if needed:
+   - `HOST=0.0.0.0`
+   - `DATA_DIR=/tmp/proptech-data`
+   - `STATIC_DIR=/opt/render/project/src/static` or `/opt/render/project/src/proptech-mvp/static`
+4. Redeploy and recheck root URL.
